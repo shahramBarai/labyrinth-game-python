@@ -4,14 +4,13 @@ Created on 15.3.2019
 @author: barai
 '''
 from coordinates import Coordinates
-from square import Square
 
 class Player():
     
     def __init__(self, name, world):
         
         self.name = name
-        self.world = None
+        self.world = world
         self.location = None
         
     def set_location(self, location):
@@ -21,12 +20,9 @@ class Player():
     def get_location(self):
         return self.location
     
-    def set_world(self, world):
-        self.world = world
-    
-    def move_up(self):
-        self.location = Coordinates(self.location.get_x(), self.get_location().get_y() - 1)
+    def try_to_move(self, a, b):
+        x = self.location.get_x() + a
+        y = self.location.get_y() + b
+        if self.world.get_square(x,y).is_wall_square() != True:
+            self.location = Coordinates(x, y)
         
-    def move_down(self):
-        self.location = Coordinates(self.location.get_x(), self.get_location().get_y() + 1)
-        print("Pressed down!")

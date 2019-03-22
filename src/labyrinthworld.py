@@ -21,7 +21,12 @@ class LabyrinthWorld():
         return len(self.squares[0])
     
     def get_square(self, x , y):
-        return self.squares[x][y]
+        '''Returns the square that is located at the given location. If the given coordinates point outside of the world,
+        this method returns a square that contains a wall and is not located in any labyrinth world'''
+        if 0 <= x < self.get_width() and 0 <= y < self.get_height():
+                return self.squares[x][y]
+        else: return Square(True) 
+        
     
     def get_player(self):
         return self.player

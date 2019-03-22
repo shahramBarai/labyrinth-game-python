@@ -8,3 +8,4 @@ class Square():
     
     def set_wall(self):
         self.is_wall = True
+            
