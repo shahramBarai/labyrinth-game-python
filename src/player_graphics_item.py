@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets, QtGui
+from PyQt5 import QtWidgets, QtGui, QtCore
 
 class PlayerGraphicsItem(QtWidgets.QGraphicsRectItem):
     
@@ -16,4 +16,5 @@ class PlayerGraphicsItem(QtWidgets.QGraphicsRectItem):
         #Update the coordinates of this item to match the attached player.
         x = self.player.get_location().get_x()
         y = self.player.get_location().get_y()
-        self.setRect(x * self.square_size, y * self.square_size, self.square_size, self.square_size)
+        playerItem = QtCore.QRectF(x * self.square_size, y * self.square_size, self.square_size*0.9, self.square_size*0.9)
+        self.setRect(playerItem)
