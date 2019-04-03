@@ -39,15 +39,19 @@ class GUI(QtWidgets.QMainWindow):
                 # Draw the walls
                 squareItem = self.world.get_square(x, y)
                 self.scene.addItem(squareItem)
-              
-    def update_grid_item(self, x, y):
-        self.world.get_square(x, y).update()
     
     def add_player_graphics_item(self):
         self.playerItem = PlayerGraphicsItem(self.world.get_player(), self.square_size)
         self.playerItem.setFlag(QtWidgets.QGraphicsItem.ItemIsFocusable)
         self.scene.addItem(self.playerItem)
-    
+        
+    def add_end_point(self):
+        x = self.world.get_endPoint().get_x()
+        y = self.world.get_endPoint().get_y()
+        endItem = QtWidgets.QGraphicsRectItem(x*self.square_size, y*self.square_size, self.square_size*0.9, self.square_size*0.9)
+        endItem.setBrush(QtGui.QColor(0,250,0))
+        self.scene.addItem(endItem)
+        
     def keyPressEvent(self, event):
         key = event.key()
         if key == QtCore.Qt.Key_W:
@@ -76,11 +80,12 @@ class GUI(QtWidgets.QMainWindow):
           
         self.grid.addWidget(self.give_up_button, 5, 1)
         self.grid.addWidget(self.new_game_button, 6, 1)
-    
         
     def update_player(self):
         if self.game_started == 0:
             self.game_started = self.world.create_maze_randomly()
+            if self.game_started == 1:
+                self.add_end_point()
         self.playerItem.update()
            
     def init_window(self):  

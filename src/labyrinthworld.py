@@ -17,7 +17,9 @@ class LabyrinthWorld():
         self.directions = [(1,0),(0,1),(-1,0),(0,-1)] # [right, down, left, up]
         self.visited = []
         self.stack = []
-
+        self.the_longest_way = []
+        self.start_point = Coordinates(0,0)
+        self.end_point = None
         
     def get_width(self):
         return len(self.squares)
@@ -27,6 +29,24 @@ class LabyrinthWorld():
     
     def get_square_size(self):
         return self.square_size
+    
+    def get_startPoint(self):
+        return self.start_point
+    
+    def set_endPoint(self):
+        if len(self.stack) > len(self.the_longest_way):
+            self.the_longest_way = self.stack.copy()
+            
+        if len(self.the_longest_way) == 0:
+            x = self.visited[-1][0]
+            y = self.visited[-1][1]
+        else:
+            x = self.the_longest_way[-1][0]
+            y = self.the_longest_way[-1][1]
+        self.end_point = Coordinates(x, y)
+        
+    def get_endPoint(self):
+        return self.end_point
     
     def get_square(self, x , y):
         '''Returns the square that is located at the given location. If the given coordinates point outside of the world,
@@ -45,7 +65,7 @@ class LabyrinthWorld():
         '''Parameter player is the player to be added: Player'''
         self.player = player
         
-    
+    '''   need to change
     def read_labyrinth_mapFolder(self, path):
         try:
             file = open(path)
@@ -63,17 +83,20 @@ class LabyrinthWorld():
                         self.player.set_location(Coordinates(x, y))
                     x += 1
                 y += 1
+    '''
     
     def create_maze_randomly(self):
         x = self.player.get_location().get_x()
         y = self.player.get_location().get_y()
         k = True
         
-        if len(self.visited) == (self.get_height()*self.get_width())-1:
-            return 1
-        
         if ((x,y) not in self.visited): self.visited.append((x,y))
-        if ((x,y) not in self.stack): self.stack.append((x,y))
+        if ((x,y) not in self.stack): self.stack.append((x,y))        
+        
+        if len(self.visited) == (self.get_height()*self.get_width()):
+            self.player.set_location(self.start_point)
+            self.set_endPoint()
+            return 1
         
         while k:
             squares_around = []
@@ -113,34 +136,11 @@ class LabyrinthWorld():
             else:
                 if len(self.stack) == 0:
                     return 1
+                if len(self.stack) > len(self.the_longest_way):
+                    self.the_longest_way = self.stack.copy()
                 self.stack.pop(-1)
                 x = self.stack[-1][0]
                 y = self.stack[-1][1]
         
         self.player.set_location(Coordinates(x,y))
         return 0
-                
-                
-                
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        

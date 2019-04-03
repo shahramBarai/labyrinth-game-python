@@ -11,7 +11,7 @@ class Square(QtWidgets.QGraphicsPolygonItem):
         self.y = y
         self.square_size = square_size
         self.setTransformOriginPoint(self.x * self.square_size, self.y * self.square_size)
-        self.setBrush(QtGui.QColor(0,0,0))
+
         self.update()
     
     def is_right_wall(self):
@@ -45,16 +45,5 @@ class Square(QtWidgets.QGraphicsPolygonItem):
             square.append(QtCore.QPointF(b, c))
             square.append(QtCore.QPointF(b, d))
             square.append(QtCore.QPointF(a, d))
-
+            
         self.setPolygon(square)
-
-        '''
-        # Left wall
-        leftWall = QtCore.QRectF(self.x * self.square_size, self.y * self.square_size, self.square_size, self.square_size)
-        leftWall.adjust(self.square_size*0.9,0,0,0)
-        # Bottom wall
-        bottomWall = QtCore.QRectF(self.x * self.square_size, self.y * self.square_size, self.square_size, self.square_size)
-        bottomWall.adjust(0, self.square_size*0.9,0,0)
-        '''
-        
-    
