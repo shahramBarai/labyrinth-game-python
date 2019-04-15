@@ -37,7 +37,7 @@ class Square(QtWidgets.QGraphicsPolygonItem):
             square.append(QtCore.QPointF(a, c))
             square.append(QtCore.QPointF(a, d))
         if self.bottom_wall == True:                                   # Bottom wall
-            a = self.x * self.square_size + self.square_size*0.9    # x: Up-right and Bottom-right corner
+            a = (self.x + 1) * self.square_size                     # x: Up-right and Bottom-right corner
             b = self.x * self.square_size                           # x: Up-left and Bottom-left corner
             c = self.y * self.square_size + self.square_size*0.9    # y: Up-left and Up-right coner
             d = (self.y + 1) * self.square_size                     # y: Bottom-left and Bottom-right coner
@@ -45,5 +45,6 @@ class Square(QtWidgets.QGraphicsPolygonItem):
             square.append(QtCore.QPointF(b, c))
             square.append(QtCore.QPointF(b, d))
             square.append(QtCore.QPointF(a, d))
-            
+        
+        self.setBrush(QtGui.QColor(0, 0, 0))
         self.setPolygon(square)
