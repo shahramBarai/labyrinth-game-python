@@ -21,6 +21,8 @@ class LabyrinthWorld():
         self.start_point = Coordinates(0,0)
         self.end_point = None
         
+        self.flag = 0
+        
     def get_width(self):
         return len(self.squares)
     
@@ -88,7 +90,6 @@ class LabyrinthWorld():
     def create_maze_randomly(self):
         x = self.player.get_location().get_x()
         y = self.player.get_location().get_y()
-        k = True
         
         if ((x,y) not in self.visited): self.visited.append((x,y))
         if ((x,y) not in self.stack): self.stack.append((x,y))        
@@ -98,7 +99,7 @@ class LabyrinthWorld():
             self.set_endPoint()
             return 1
         
-        while k:
+        while True:
             squares_around = []
             for direction in self.directions:
                 a = x + direction[0]
@@ -132,9 +133,9 @@ class LabyrinthWorld():
                     y = y - 1
                     self.squares[x][y].delete_bottom_wall()
                     self.squares[x][y].update()
-                k = False
+                break
             else:
-                if len(self.stack) == 0:
+                if len(self.stack) <= 1:
                     return 1
                 if len(self.stack) > len(self.the_longest_way):
                     self.the_longest_way = self.stack.copy()
@@ -144,3 +145,112 @@ class LabyrinthWorld():
         
         self.player.set_location(Coordinates(x,y))
         return 0
+    
+    def preper_to_solving(self):
+        x = self.player.get_location().get_x()
+        y = self.player.get_location().get_y()
+        self.stack = []
+        self.visited = []
+        if (x,y) in self.the_longest_way:
+            self.flag = 1
+            self.the_longest_way.pop(-1)
+            self.the_longest_way.reverse()
+            while True:
+                if self.the_longest_way[-1] == (x,y):
+                    break
+                self.the_longest_way.pop(-1)
+            self.stack = self.the_longest_way.copy()
+        else: 
+            self.flag = 0
+        
+    
+    def solving_a_maze(self):
+        if len(self.the_longest_way) == 0:
+            return 0
+        
+        if self.flag == 1:
+            x = self.the_longest_way[-1][0]
+            y = self.the_longest_way[-1][1]            
+            self.the_longest_way.pop(-1)
+        else:
+            
+            x = self.player.get_location().get_x()
+            y = self.player.get_location().get_y()
+            
+            if ((x,y) not in self.visited): self.visited.append((x,y))
+            if ((x,y) not in self.stack): self.stack.append((x,y)) 
+
+            while True:
+                squares_around = []
+                if (self.squares[x][y].is_right_wall() != True) and ((x+1, y) not in self.visited):
+                    squares_around.append((x+1, y))
+                if (self.squares[x][y].is_bottom_wall() != True) and ((x, y+1) not in self.visited):
+                    squares_around.append((x, y+1))
+                if (self.squares[x-1][y].is_right_wall() != True) and ((x-1, y) not in self.visited):
+                    squares_around.append((x-1, y))
+                if (self.squares[x][y-1].is_bottom_wall() != True) and ((x, y-1) not in self.visited):
+                    squares_around.append((x, y-1))
+
+                if len(squares_around) != 0:
+                    i = random.choice(squares_around)
+                    x = i[0]
+                    y = i[1]
+                    break
+                else:
+                    if len(self.stack) <= 1:
+                        return 0
+                    self.stack.pop(-1)
+                    x = self.stack[-1][0]
+                    y = self.stack[-1][1]
+                
+            if (x,y) in self.the_longest_way:
+                self.flag = 1
+                self.the_longest_way.pop(-1)
+                self.the_longest_way.reverse()
+                while True:
+                    if self.the_longest_way[-1] == (x,y):
+                        break
+                    self.the_longest_way.pop(-1)
+                self.stack = self.stack + self.the_longest_way
+        
+        self.player.set_location(Coordinates(x,y))
+        return 1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
