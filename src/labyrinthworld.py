@@ -5,14 +5,10 @@ import random
 
 class LabyrinthWorld():
     
-    def __init__(self, width, height, square_size):
-        self.square_size = square_size
-        self.squares = [None] * width
-        for x in range(self.get_width()):
-            self.squares[x] = [None] * height
-            for y in range(self.get_height()):
-                self.squares[x][y] = Square(x, y, self.square_size)
-                
+    def __init__(self, width=9, height=9, square_size=50):
+        
+        self.create_grid(width, height, square_size)
+        
         self.player = Player
         self.directions = [(1,0),(0,1),(-1,0),(0,-1)] # [right, down, left, up]
         self.visited = []
@@ -22,6 +18,14 @@ class LabyrinthWorld():
         self.end_point = None
         
         self.flag = 0
+    
+    def create_grid(self, width, height, sq_size):
+        self.square_size = sq_size
+        self.squares = [None] * width
+        for x in range(self.get_width()):
+            self.squares[x] = [None] * height
+            for y in range(self.get_height()):
+                self.squares[x][y] = Square(x, y, self.square_size)
         
     def get_width(self):
         return len(self.squares)
@@ -151,9 +155,8 @@ class LabyrinthWorld():
         y = self.player.get_location().get_y()
         self.stack = []
         self.visited = []
-        if (x,y) in self.the_longest_way:
+        if ((x,y) in self.the_longest_way) and Coordinates(x,y) != self.end_point:
             self.flag = 1
-            self.the_longest_way.pop(-1)
             self.the_longest_way.reverse()
             while True:
                 if self.the_longest_way[-1] == (x,y):
@@ -177,6 +180,7 @@ class LabyrinthWorld():
             x = self.player.get_location().get_x()
             y = self.player.get_location().get_y()
             
+            if Coordinates(x,y) == self.end_point: return 0
             if ((x,y) not in self.visited): self.visited.append((x,y))
             if ((x,y) not in self.stack): self.stack.append((x,y)) 
 
@@ -205,13 +209,13 @@ class LabyrinthWorld():
                 
             if (x,y) in self.the_longest_way:
                 self.flag = 1
-                self.the_longest_way.pop(-1)
                 self.the_longest_way.reverse()
                 while True:
                     if self.the_longest_way[-1] == (x,y):
                         break
                     self.the_longest_way.pop(-1)
-                self.stack = self.stack + self.the_longest_way
+                self.stack.reverse()
+                self.stack = self.the_longest_way + self.stack
         
         self.player.set_location(Coordinates(x,y))
         return 1

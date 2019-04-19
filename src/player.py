@@ -35,4 +35,3 @@ class Player():
             y = y - 1
         
         self.location = Coordinates(x, y)
-        
