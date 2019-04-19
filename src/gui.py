@@ -11,8 +11,19 @@ class GUI(QtWidgets.QMainWindow):
     def __init__(self, world):
         super().__init__()
         self.setCentralWidget(QtWidgets.QWidget())
-        self.grid = QtWidgets.QGridLayout(self)
-        self.centralWidget().setLayout(self.grid)
+        
+        #Creating Layouts
+        self.winBox = QtWidgets.QHBoxLayout()
+        self.centralWidget().setLayout(self.winBox)
+        
+        self.gameBox = QtWidgets.QVBoxLayout()
+        self.box = QtWidgets.QBoxLayout(2)                  #Direction top to botttom
+        self.winBox.addLayout(self.gameBox)
+        self.winBox.setStretchFactor(self.gameBox, 8)
+        self.winBox.addLayout(self.box)
+        self.winBox.setStretchFactor(self.box, 2)
+        
+        
         
         self.world = world
         self.square_size = self.world.get_square_size()
@@ -37,7 +48,16 @@ class GUI(QtWidgets.QMainWindow):
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update_player)
         self.timer.start(self.time_interval) # Milliseconds
-        
+    
+    def tools_window(self):
+        sub = QtWidgets.QMdiSubWindow()
+        sub.setWidget(QtWidgets.QTextEdit())
+        sub.setWindowTitle("subwindow")
+        self.mdi.addSubWindow(sub)
+        sub.show()
+        '''
+        self.new_game_button.deleteLater()
+        '''
     def add_labyrinth_world_grid_items(self):
         #Draw a game zone
         for x in range(self.world.get_width()):
@@ -99,7 +119,7 @@ class GUI(QtWidgets.QMainWindow):
             self.isMazeSolvided = True
             self.world.preper_to_solving()
             self.timer.timeout.disconnect(self.update_player)
-            self.time_interval = 10
+            self.time_interval = 50
             self.timer.start(self.time_interval)
             self.timer.timeout.connect(self.start_solving_maze)
         
@@ -161,7 +181,7 @@ class GUI(QtWidgets.QMainWindow):
         self.time_m_lcd.display(self.time.minute())
         self.time_s_lcd.display(self.time.second())
            
-    def init_window(self):  
+    def init_window(self):
         # Sets up the window.
         self.setMinimumSize(685, 535)
         self.setMaximumSize(685, 535)
@@ -169,12 +189,12 @@ class GUI(QtWidgets.QMainWindow):
         
         ''' Name '''
         self.nameEdit = QtWidgets.QLineEdit()
-        self.grid.addWidget(self.nameEdit, 0, 1)
+        self.box.addWidget(self.nameEdit)
         
         self.timeBox()
-        self.gameMode()
-        self.console()
         self.score()
+        self.console()
+        '''self.gameMode()'''
         
         # Add a scene for drawing 2d objects
         self.scene = QtWidgets.QGraphicsScene()
@@ -183,9 +203,7 @@ class GUI(QtWidgets.QMainWindow):
         self.view.adjustSize()
         self.view.setBackgroundBrush(QtGui.QColor(0, 0, 0))
             
-        self.grid.setColumnStretch(0, 8)
-        self.grid.setColumnStretch(1, 2)
-        self.grid.addWidget(self.view, 0, 0, 8, 1)
+        self.gameBox.addWidget(self.view)
     
 
     def timeBox(self):
@@ -207,8 +225,7 @@ class GUI(QtWidgets.QMainWindow):
         hbox.addWidget(lb2)
         hbox.addWidget(self.time_s_lcd)
         hbox.addStretch(1)
-        self.grid.setRowStretch(1, 1)
-        self.grid.addLayout(hbox, 1, 1)
+        self.box.addLayout(hbox, 1)
         
     def score(self):
         ''' Score '''
@@ -228,7 +245,7 @@ class GUI(QtWidgets.QMainWindow):
         vbox.addStretch(1)
         
         groupBox.setLayout(vbox)
-        self.grid.addWidget(groupBox, 2, 1)
+        self.box.addWidget(groupBox)
                   
     def console(self):
         ''' Console '''
@@ -239,8 +256,7 @@ class GUI(QtWidgets.QMainWindow):
         self.textBox.setStyleSheet("QTextEdit {background-color:rgba(100, 100, 100, 125)}") # Set background color
         self.whriteText("Welcome!")
         
-        self.grid.addWidget(self.textBox, 3, 1)
-        self.grid.setRowStretch(3, 6)
+        self.box.addWidget(self.textBox, 9)
         
     def whriteText(self, string):
         self.textLine += 1
@@ -252,20 +268,23 @@ class GUI(QtWidgets.QMainWindow):
         self.cb.addItems(["Easy", "Normal", "Hard"])
         self.cb.currentIndexChanged.connect(self.changeGameMode)
         
-        self.grid.addWidget(self.cb, 4, 1)
+        self.box.addWidget(self.cb)
     
     def changeGameMode(self, i):
         self.game_mode = i
         print(i)
         
     def init_buttons(self):
-        self.start_button = QtWidgets.QPushButton("Start")
+        #self.start_button = QtWidgets.QPushButton("Start")
+        #self.start_button.clicked.connect(self.start_game)
         give_up_button = QtWidgets.QPushButton("Give Up")
-        new_game_button = QtWidgets.QPushButton("New Game")
-        
-        self.start_button.clicked.connect(self.start_game)
         give_up_button.clicked.connect(self.start_solving_maze)
+        self.new_game_button = QtWidgets.QPushButton("New Game")
+        self.new_game_button.clicked.connect(self.tools_window)
         
-        self.grid.addWidget(self.start_button, 5, 1)
-        self.grid.addWidget(give_up_button, 6, 1)
-        self.grid.addWidget(new_game_button, 7, 1)
+        
+        
+        
+        #self.box.addWidget(self.start_button, 1)
+        self.box.addWidget(give_up_button)
+        self.box.addWidget(self.new_game_button)
