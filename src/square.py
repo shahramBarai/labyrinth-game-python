@@ -5,7 +5,7 @@ class Square(QtWidgets.QGraphicsRectItem):
     def __init__(self, x, y, square_size, right_wall=True, bottom_wall=True):
         super(Square, self).__init__()
         self.right_wall = right_wall
-        self.bettaottom_wall = bottom_wall
+        self.bottom_wall = bottom_wall
         
         self.x = x
         self.y = y
@@ -35,13 +35,13 @@ class Square(QtWidgets.QGraphicsRectItem):
         return self.right_wall
     
     def is_bottom_wall(self):
-        return self.bettaottom_wall
+        return self.bottom_wall
     
     def delete_right_wall(self):
         self.right_wall = False
     
     def delete_bottom_wall(self):
-        self.bettaottom_wall = False
+        self.bottom_wall = False
     
     def setColor(self, a, b, c):
         self.setBrush(QtGui.QColor(a, b, c))
@@ -57,7 +57,7 @@ class Square(QtWidgets.QGraphicsRectItem):
             square.append(QtCore.QPointF(self.alfa, b))             #Up-left corner
             square.append(QtCore.QPointF(self.alfa, self.betta))    #Bottom-left coner
             
-        if self.bettaottom_wall:                                    # Bottom wall
+        if self.bottom_wall:                                    # Bottom wall
             a = (self.y + 1) * self.square_size                     # y: Bottom-left and Bottom-right coner
             b = self.x * self.square_size                           # x: Up-left and Bottom-left corner
             square.append(QtCore.QPointF(self.alfa, self.betta))    #Up-right coner
