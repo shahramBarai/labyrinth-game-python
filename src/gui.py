@@ -17,13 +17,9 @@ class GUI(QtWidgets.QMainWindow):
         self.centralWidget().setLayout(self.winBox)
         
         self.gameBox = QtWidgets.QVBoxLayout()
-        self.box = QtWidgets.QBoxLayout(2)                  #Direction top to botttom
-        self.winBox.addLayout(self.gameBox)
-        self.winBox.setStretchFactor(self.gameBox, 8)
-        self.winBox.addLayout(self.box)
-        self.winBox.setStretchFactor(self.box, 2)
-        
-        
+        self.box = QtWidgets.QBoxLayout(2)                  #Direction "Top to Botttom"
+        self.winBox.addLayout(self.gameBox, 8)
+        self.winBox.addLayout(self.box, 2)
         
         self.world = world
         self.square_size = self.world.get_square_size()
@@ -32,32 +28,20 @@ class GUI(QtWidgets.QMainWindow):
         self.isMazeSolvided = False
         self.game_mode = 0
         
-        self.time_interval = 10
+        self.time_interval = 1             # Milliseconds
         self.time = QtCore.QTime(0, 0, 0)
         
         self.init_window()
         self.init_buttons()
+        self.start_menu()
         self.show()
         
-        # Creating maze and player
-        self.add_labyrinth_world_grid_items()
-        self.add_player_graphics_item()
-        self.update_player()
-        
+        self.bob = 0
         # Set a timer to call the update function periodically
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update_player)
-        self.timer.start(self.time_interval) # Milliseconds
-    
-    def tools_window(self):
-        sub = QtWidgets.QMdiSubWindow()
-        sub.setWidget(QtWidgets.QTextEdit())
-        sub.setWindowTitle("subwindow")
-        self.mdi.addSubWindow(sub)
-        sub.show()
-        '''
-        self.new_game_button.deleteLater()
-        '''
+        self.timer.start(self.time_interval)
+        
     def add_labyrinth_world_grid_items(self):
         #Draw a game zone
         for x in range(self.world.get_width()):
@@ -75,20 +59,139 @@ class GUI(QtWidgets.QMainWindow):
         x = self.world.get_endPoint().get_x()
         y = self.world.get_endPoint().get_y()
         endItem = QtWidgets.QGraphicsRectItem(x*self.square_size, y*self.square_size, self.square_size*0.85, self.square_size*0.85)
-        endItem.setBrush(QtGui.QColor(250,250,250))
+        endItem.setBrush(QtGui.QColor(250, 250, 250))
         self.scene.addItem(endItem)
     
     def start_game(self):
-        self.isStarted = True
-        print(self.nameEdit.text())
-        self.start_button.setEnabled(False)
-        self.nameEdit.setEnabled(False)
-        self.cb.setEnabled(False)
-        self.whriteText("Game Starded!")
+        self.new_game_button.setEnabled(False)
+        darkRed = QtCore.Qt.darkRed
+        if self.game_mode == 1:
+            self.world.create_grid(25, 25, 19)  #Norlam size
+            self.square_size = 19
+        elif self.game_mode == 2:
+            self.world.create_grid(49, 49, 10)  #Big size
+            self.square_size = 10
+        elif self.game_mode == 3:               #Custom
+            error_text = '''Attention!!! The size of the map was entered incorrectly. The width and height (x, y) must be integers and greater than one.'''
+            try:
+                x = int(self.xl.text())
+                y = int(self.yl.text())
+                if x <= 1 or y <= 1: 
+                    self.whriteText(error_text, darkRed)
+                    return
+                if x > y:
+                    self.square_size = int(500/x)
+                    self.world.create_grid(x, y, self.square_size)
+                else:
+                    self.square_size = int(500/y)
+                    self.world.create_grid(x, y, self.square_size)
+            except ValueError:
+                self.whriteText(error_text, darkRed)
+                return
+        else: 
+            self.world.create_grid(9, 9, 50)    #Small
+            self.square_size = 50
         
+        if str(self.nameEdit.text()) == "":
+            self.whriteText("Write the name", darkRed)
+            return
+        else: self.world.set_player(str(self.nameEdit.text()))
+        
+        self.name_l.deleteLater()
+        self.nameEdit.deleteLater()
+        self.worldSizeGBox.deleteLater()
+        self.start_button.deleteLater()
+        self.menuBox.deleteLater()
+        
+        self.isStarted = True
+        self.whriteText("Hi {}! Game Started!".format(self.world.get_player().get_name()))
+        self.world.get_player().set_location(self.world.get_startPoint())
+        
+        # Add a scene for drawing 2d objects
+        self.scene = QtWidgets.QGraphicsScene()
+        # Add a view for showing the scene
+        self.view = QtWidgets.QGraphicsView(self.scene, self)
+        self.view.adjustSize()
+        self.view.setBackgroundBrush(QtGui.QColor(0, 0, 0))
+        self.view.setStyleSheet("border: 0px")
+        self.gameBox.addWidget(self.view)
+        
+        # Creating maze and player
+        self.add_labyrinth_world_grid_items()
+        self.add_player_graphics_item()
+        self.update_player()
+    
+    def start_menu(self):
+        self.new_game_button.setEnabled(False)
+        if self.isStarted == False:
+            self.menuBox = QtWidgets.QGridLayout()
+            self.menuBox.setColumnStretch(0,3)
+            self.menuBox.setColumnStretch(1,1)
+            self.menuBox.setColumnStretch(2,3)
+            self.menuBox.setColumnStretch(3,3)
+            self.menuBox.setRowStretch(0,4)
+            self.menuBox.setRowStretch(1,1)
+            self.menuBox.setRowStretch(2,1)
+            self.menuBox.setRowStretch(3,1)
+            self.menuBox.setRowStretch(4,1)
+            self.menuBox.setRowStretch(5,4)
+            
+            '''Name'''
+            self.name_l = QtWidgets.QLabel("    Name:")
+            self.nameEdit = QtWidgets.QLineEdit()
+            self.nameEdit.setText(self.world.get_player().get_name())
+            self.menuBox.addWidget(self.name_l, 1, 1)
+            self.menuBox.addWidget(self.nameEdit, 1, 2)
+            
+            '''Game mode'''
+            self.worldSizeGBox = QtWidgets.QGroupBox("World Size")
+            hbox = QtWidgets.QHBoxLayout()
+            hbox.addStretch(1)
+            cb = QtWidgets.QComboBox()
+            cb.addItems(["Small", "Normal", "Big", "Custom"])
+            cb.currentIndexChanged.connect(self.changeGameMode)
+            hbox.addWidget(cb)
+            xt = QtWidgets.QLabel("X:")
+            self.xl = QtWidgets.QLineEdit()
+            hbox.addWidget(xt)
+            hbox.addWidget(self.xl)
+            self.xl.setEnabled(False)
+            yt = QtWidgets.QLabel("Y:")
+            self.yl = QtWidgets.QLineEdit()
+            hbox.addWidget(yt)
+            hbox.addWidget(self.yl)
+            self.yl.setEnabled(False)
+            
+            cb.setCurrentIndex(self.game_mode)
+            self.worldSizeGBox.setLayout(hbox)
+            self.menuBox.addWidget(self.worldSizeGBox, 2, 1, 1, 2)
+            
+            '''Start point'''
+            self.startPointGBox = QtWidgets.QGroupBox("Starting point")
+            self.menuBox.addWidget(self.startPointGBox, 3, 1)
+            
+            '''Start button'''
+            self.start_button = QtWidgets.QPushButton("Start")
+            self.start_button.clicked.connect(self.start_game)
+            self.menuBox.addWidget(self.start_button, 4, 1, 1, 2)
+            self.gameBox.addLayout(self.menuBox)
+    
     def end_game(self):
+        if self.isStarted: self.whriteText("Game Ended!")
         self.isStarted = False
-        self.whriteText("Game Ended!")
+        
+    def new_game(self):
+        self.end_game()
+        self.view.deleteLater()
+        self.world.deleteWorld()
+        
+        self.flag = 0
+        self.isStarted = False
+        self.isMazeSolvided = False
+        
+        self.time = QtCore.QTime(0, 0, 0)
+        
+        self.start_menu()
         
     def show_solving_way(self):
         a = 101
@@ -118,25 +221,23 @@ class GUI(QtWidgets.QMainWindow):
             self.end_game()
             self.isMazeSolvided = True
             self.world.preper_to_solving()
-            self.timer.timeout.disconnect(self.update_player)
-            self.time_interval = 50
-            self.timer.start(self.time_interval)
+            self.timer.timeout.disconnect()
             self.timer.timeout.connect(self.start_solving_maze)
-        
+            
         if self.isMazeSolvided == True and self.flag == 1 and self.isStarted == False:
             self.flag = self.world.solving_a_maze()
             if self.flag == 0:
                 self.show_solving_way()
-                self.timer.timeout.disconnect(self.start_solving_maze)
+                self.timer.timeout.disconnect()
+                self.timer.timeout.connect(self.update_player)
             self.playerItem.update()
-            
-            
-    
+          
     def checkPosition(self):
         player = self.world.get_player().get_location()
         end = self.world.get_endPoint()
         if (player.get_x() == end.get_x()) and (player.get_y() == end.get_y()):
             self.end_game()
+        self.playerItem.update()
     
     def keyPressEvent(self, event):
         if self.isStarted and self.flag == 1:
@@ -165,15 +266,15 @@ class GUI(QtWidgets.QMainWindow):
             self.checkPosition()
             
     def update_player(self):
-        if self.isStarted and self.flag == 0:
-            self.flag = self.world.create_maze_randomly()
+        if self.isStarted:
+            if self.flag == 0:
+                self.flag = self.world.create_maze_randomly()
+                if self.flag == 1:
+                    self.add_end_point()
             if self.flag == 1:
-                self.add_end_point()
-                self.time_interval = 10
-                self.timer.start(self.time_interval)
-        if self.isStarted and self.flag == 1:
-            self.timerEvent()
-        self.playerItem.update()
+                self.timerEvent()
+                self.new_game_button.setEnabled(True)
+            self.playerItem.update()
     
     def timerEvent(self):
         self.time = self.time.addMSecs(self.time_interval)
@@ -188,24 +289,13 @@ class GUI(QtWidgets.QMainWindow):
         self.setWindowTitle("Labyrinth Game")
         
         ''' Name '''
-        self.nameEdit = QtWidgets.QLineEdit()
-        self.box.addWidget(self.nameEdit)
+        nameEdit = QtWidgets.QLineEdit()
+        self.box.addWidget(nameEdit)
         
         self.timeBox()
-        self.score()
         self.console()
-        '''self.gameMode()'''
-        
-        # Add a scene for drawing 2d objects
-        self.scene = QtWidgets.QGraphicsScene()
-        # Add a view for showing the scene
-        self.view = QtWidgets.QGraphicsView(self.scene, self)
-        self.view.adjustSize()
-        self.view.setBackgroundBrush(QtGui.QColor(0, 0, 0))
-            
-        self.gameBox.addWidget(self.view)
+        self.score()
     
-
     def timeBox(self):
         ''' Timer '''
         self.time_h_lcd = QtWidgets.QLCDNumber(2)
@@ -229,7 +319,7 @@ class GUI(QtWidgets.QMainWindow):
         
     def score(self):
         ''' Score '''
-        groupBox = QtWidgets.QGroupBox("Score")
+        scoreGBox = QtWidgets.QGroupBox("Score")
         vbox = QtWidgets.QVBoxLayout()
         sl1 = QtWidgets.QLabel("1.")
         sl2 = QtWidgets.QLabel("2.")
@@ -244,21 +334,21 @@ class GUI(QtWidgets.QMainWindow):
         vbox.addWidget(sl5)
         vbox.addStretch(1)
         
-        groupBox.setLayout(vbox)
-        self.box.addWidget(groupBox)
+        scoreGBox.setLayout(vbox)
+        self.box.addWidget(scoreGBox)
                   
     def console(self):
         ''' Console '''
         self.textLine = 0
         self.textBox = QtWidgets.QTextBrowser()
         self.textBox.setFont(QtGui.QFont("Carlito"))                                        # Set text style
-        self.textBox.setTextColor(QtGui.QColor(255, 255, 255))                              # Set text color 
-        self.textBox.setStyleSheet("QTextEdit {background-color:rgba(100, 100, 100, 125)}") # Set background color
+        self.textBox.setStyleSheet("QTextEdit {background-color:rgba(100, 100, 100, 250)}") # Set background color
         self.whriteText("Welcome!")
         
         self.box.addWidget(self.textBox, 9)
         
-    def whriteText(self, string):
+    def whriteText(self, string, color = QtCore.Qt.white):
+        self.textBox.setTextColor(color)                                # Set text color 
         self.textLine += 1
         line = str(self.textLine) + ": " + string
         self.textBox.append(line)
@@ -272,19 +362,20 @@ class GUI(QtWidgets.QMainWindow):
     
     def changeGameMode(self, i):
         self.game_mode = i
-        print(i)
-        
+        if i == 3:
+            self.xl.setEnabled(True)
+            self.yl.setEnabled(True)
+        else:
+            self.xl.setEnabled(False)
+            self.yl.setEnabled(False)
+
     def init_buttons(self):
-        #self.start_button = QtWidgets.QPushButton("Start")
-        #self.start_button.clicked.connect(self.start_game)
         give_up_button = QtWidgets.QPushButton("Give Up")
         give_up_button.clicked.connect(self.start_solving_maze)
         self.new_game_button = QtWidgets.QPushButton("New Game")
-        self.new_game_button.clicked.connect(self.tools_window)
+        self.new_game_button.clicked.connect(self.new_game)
         
         
-        
-        
-        #self.box.addWidget(self.start_button, 1)
         self.box.addWidget(give_up_button)
         self.box.addWidget(self.new_game_button)
+        
