@@ -14,8 +14,11 @@ class Square(QtWidgets.QGraphicsRectItem):
         self.wt = 0.85                                      #Wall thickness
         self.alfa = (self.x + self.wt) * self.square_size   #Constant
         self.betta = (self.y + self.wt) * self.square_size  #Constant
+        self.r = 200          
+        self.b = 230          # Square color (red, blue, grin)
+        self.g = 200
         
-        self.setBrush(QtGui.QColor(200, 230, 200))
+        self.setBrush(QtGui.QColor(self.r, self.b, self.g))
         self.setRect(self.x*self.square_size, self.y*self.square_size, self.square_size, self.square_size)
         self.setPen(QtGui.QPen(-1))
         self.wallItem = QtWidgets.QGraphicsPolygonItem(self)
@@ -29,7 +32,6 @@ class Square(QtWidgets.QGraphicsRectItem):
         c = (1 - self.wt) * self.square_size
         columnItem = QtWidgets.QGraphicsRectItem(self.alfa, self.betta, c, c, self)
         columnItem.setBrush(QtGui.QColor(0, 0, 0))
-        
 
     def is_right_wall(self):
         return self.right_wall
@@ -39,12 +41,20 @@ class Square(QtWidgets.QGraphicsRectItem):
     
     def delete_right_wall(self):
         self.right_wall = False
+        self.update()
     
     def delete_bottom_wall(self):
         self.bottom_wall = False
+        self.update()
     
-    def setColor(self, a, b, c):
-        self.setBrush(QtGui.QColor(a, b, c))
+    def setColor(self, r, b, g, a=250):
+        self.r = r
+        self.b = b
+        self.g = g
+        self.setBrush(QtGui.QColor(r, b, g, a))
+    
+    def getColor(self):
+        return (self.r, self.b, self.g)
 
     def update(self):
         square = QtGui.QPolygonF()
