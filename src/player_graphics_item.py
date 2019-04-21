@@ -9,7 +9,7 @@ class PlayerGraphicsItem(QtWidgets.QGraphicsRectItem):
         self.square_size = square_size
         
         # Set player color red
-        self.setBrush(QtGui.QColor(255,0,0))
+        self.setBrush(QtGui.QColor(200,0,0))
         self.update()
     
     def update(self):
