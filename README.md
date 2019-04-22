@@ -1,23 +1,38 @@
-1. Mitä ominaisuuksia olet jo toteuttanut projektiisi?
+# Labyrinth Game
 
-- Ohjelma luo labyrintin ja asettaa pelaajan kartalle. Näppäimistön avulla voi
-liikuttaa pelaaja, myös pelissa on fysiikka eli pelaaja ei voi liikkua seinien 
-läpi.
+## Olen tekemässä ohjelma, joka luo ja piirtää ruudulle labyrintin, sekä asettaa
+pelaajan labyrintin vapaaseen ruutuun. Käyttäjän tehtävä on ohjata hiiri pois
+labyrintistä. Hänellä on mahdollisuus luovuttaa, jolloin ohjelma näyttää oikea
+ratkaisu kuljettamalla hiiri pois labyrintistä. Labyrintti tukee myös toisiaan
+ylittäviä ja alittavia reittejä eli ei ole vain tasomainen. Labyrintin koon on
+vapaasti annettavissa. Myös labyrintti voidaan tallentaa ohjelmasta tiedostoon.
 
-2. Käyttöohje
+Ohjelma käynnistetään Eclipsen tai python konsolin avulla. Käyttäjä pystyy
+syöttämään nimen, muuttaa labyrintin kokoa ja lähtöpistettä. Myös on
+mahdollista katsoa, miten labyrintti luodaan ja asettaa “häntä”,joka näyttää
+kuluneen matkan.
 
-- Kyllä
-- Eclipse, python console
-- Voi liikuttaa pelaaja
+Pelin aikana käyttäjä näkee peliajan ja konsolin, missä ovat pelin kommentit.
+Oikeassa alakulmassa ovat kaksi painiketta “New Game” ja “Give Up”. Yllä on
+taulukko, jossa näkyy parhaat pisteet.
 
-3. Aikataulu
+## Koodit löytyy src kansiossa, jossa on vain pelin käynnistämisen tarvitavat koodit
 
-- Noin 30h, jossa suuri osa ajasta on ollut materiaalin etsiminen ja ymmärtäminen.
-- Kyllä, on muutoksia suunnitelman aikatauluun. Vaihdoin järjestyksen eli ensin
-hiotaan labyrintin luominen ja oikean reitin etsiminen, ja vasta sitten ulkoasu.
+## Asennusohje
 
-4. Muuta
+- Ohjelma tarvitsee vain PyQt5 kirjastoa, joka saa asennettua ajamalla komentorivissa
+seuraava komento:
 
-- Ei ole ilmaantunut erityisiä ongelmia.
-- Kyllä, on muutoksia. Aluksi halusin luoda labyrintin tiedostosta, jossa on jo 
-tallennettu kartta. Mielestäni se oli liian helppo ja tylsä pelaajan näkökulmasta.
+	-Komentorivi Windowsilla
+	-Paina näppäínyhdistelmää ’Windowskey + r’. Kirjoita avautuneeseen laatikkoon ’cmd’ ja paina ok.
+	
+	# Huom: Nämä komennot ajetaan suoraan komentoriviltä, ei Python-tulkista
+	pip install pyqt5
+	
+## Käyttöohje
+
+- Painamalla oikeassa yläkulmassa download-painiketta "download.zip"
+- Pura kansion sisältö esim. työpöydälle
+- Avaa Eclpise ohjelma -> luon uusi PyDeV Project -> nimea sen esim. LabyrinthGame
+- Siirrä kaikki tiedostot src-kansiosta "LabyrinthGame"-kansioon (Huom: vain sisältö, ilman srs-kansioa)
+- Avaa main.py ja painaa "Run"-painiketta
