@@ -25,8 +25,7 @@ taulukko, jossa näkyy parhaat pisteet.
 
 - Ohjelma tarvitsee vain PyQt5 kirjastoa, joka saa asennettua ajamalla komentorivissa
 seuraava komento:
-//Huom: Nämä komennot ajetaan suoraan komentoriviltä, ei Python-tulkista
-pip install pyqt5
+	- pip install pyqt5		//Huom: Nämä komennot ajetaan suoraan komentoriviltä, ei Python-tulkista
 
 - Komentorivi Windowsilla
 	- Paina näppäínyhdistelmää ’Windowskey + r’. Kirjoita avautuneeseen laatikkoon ’cmd’ ja paina ok.
