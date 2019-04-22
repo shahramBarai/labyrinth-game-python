@@ -21,9 +21,9 @@ class LabyrinthWorld():
     def create_grid(self, width, height, sq_size):
         self.square_size = sq_size
         self.squares = [None] * width
-        for x in range(self.get_width()):
+        for x in range(width):
             self.squares[x] = [None] * height
-            for y in range(self.get_height()):
+            for y in range(height):
                 self.squares[x][y] = Square(x, y, self.square_size)
         
     def get_width(self): return len(self.squares)
@@ -79,7 +79,7 @@ class LabyrinthWorld():
         except OSError:
             return False
         else:
-            info = "{}:{}:{}:{}".format(self.player.get_name(), self.square_size, self.get_width(), self.get_height())
+            info = "{}:{}:{}:{}".format(self.player.get_name(), self.get_width(), self.get_height(), self.square_size)
             for t in self.endTime:
                 info = info + ":" + str(t)
             info += "\n"
@@ -114,7 +114,6 @@ class LabyrinthWorld():
             info_line = file.readline()
             info_line = info_line.rstrip()
             info = info_line.split(":")
-            
             self.player.set_name(info[0])
             self.create_grid(int(info[1]), int(info[2]), int(info[3]))
             time = (int(info[4]), int(info[5]), int(info[6]))
@@ -123,19 +122,23 @@ class LabyrinthWorld():
             y = 0
             for line in file:
                 line = line.rstrip()
+                count = 0
                 x = 0
                 for l in line:
-                    count = 0
-                    sq = Square(x, y, self.square_size)
-                    if count == 0: sq.delete_bottom_wall()
+                    if count == 0:
+                        sq = Square(x, y, self.square_size)
+                        sq.delete_bottom_wall()
                     elif count == 1:
-                        if l == "s":self.set_startPoint(x, y)
-                        elif l == "0": self.player.set_location(Coordinates(x, y))
+                        if l == "s": self.set_startPoint(x, y)
+                        elif l == "o": self.player.set_location(Coordinates(x, y))
+                        elif l == "x": sq.setColor(200, 200 , 200, 200)
                         elif l == "e": self.end_point = Coordinates(x, y)
-                    elif count == 3:
+                    elif count == 2: 
                         sq.delete_right_wall()
+                    if count >= 2: 
                         x += 1
-                    count += 1
+                        count = 0
+                    else: count += 1
                 y += 1
             file.close()
         except OSError:
@@ -143,7 +146,7 @@ class LabyrinthWorld():
         except ValueError:
             file.close()
             return False
-    
+        return True
     def create_maze_randomly(self, show_generation, is_ready=False):
         while True:
             x = self.player.get_location().get_x()

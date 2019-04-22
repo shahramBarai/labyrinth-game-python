@@ -29,7 +29,7 @@ class StartMenu():
         self.gameSize()
         self.startPoint()
         self.tools()
-        self.saveMazeTools()
+        #self.saveMazeTools()
     
     def name(self):
         self.name_l = QtWidgets.QLabel("    Name:")
@@ -164,8 +164,8 @@ class StartMenu():
         self.worldSizeGBox.deleteLater()
         self.startPointGBox.deleteLater()
         self.toolGBox.deleteLater()
-        self.openCheckBox.deleteLater()
-        self.openButton.deleteLater()
+        #self.openCheckBox.deleteLater()
+        #self.openButton.deleteLater()
         self.menuBox.deleteLater()
 
 
