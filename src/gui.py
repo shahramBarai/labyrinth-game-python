@@ -6,6 +6,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 from player_graphics_item import PlayerGraphicsItem
 from coordinates import Coordinates
 from startmenu import StartMenu
+from score import Score
 
 class GUI(QtWidgets.QMainWindow):
     
@@ -31,6 +32,7 @@ class GUI(QtWidgets.QMainWindow):
         self.maze_is_ready = False
         self.time_interval = 1             # Milliseconds
         self.time = QtCore.QTime(0, 0, 0)
+        #Need for score calculation
         self.length = 0                     # Start and end length
         self.player_steps = 0               # Player steps
         
@@ -58,9 +60,7 @@ class GUI(QtWidgets.QMainWindow):
     def add_end_point(self):
         x = self.world.get_endPoint().get_x()
         y = self.world.get_endPoint().get_y()
-        #endItem = QtWidgets.QGraphicsRectItem(x*self.square_size, y*self.square_size, self.square_size*0.85, self.square_size*0.85)
         self.world.get_square(x, y).setColor(0, 100, 0)
-        #self.scene.addItem(endItem)
     
     def star_game(self):
         if self.game_button.text() == "Start": 
@@ -89,8 +89,7 @@ class GUI(QtWidgets.QMainWindow):
             
     def create_game_field(self):
         self.darkRed = QtCore.Qt.darkRed
-        error_text1 = '''Attention!!! The size of the map was entered incorrectly. The width and height (x, y) must be integers and greater than one.'''
-        
+        error_text = '''Attention!!! The size of the map was entered incorrectly. The width and height (x, y) must be integers and greater than one.'''
         name = self.start_menu.get_name()
         if name != "": self.world.set_player(name)  
         else: 
@@ -110,13 +109,14 @@ class GUI(QtWidgets.QMainWindow):
             elif i == 3: self.world.set_startPoint(x-1 , y-1)           # Right_Bottom
             elif i == 4: self.world.set_startPoint(int(x/2), int(y/2))  # Middle"
         else:
-            self.writeText(error_text1, self.darkRed)
+            self.writeText(error_text, self.darkRed)
             return
-        
+            
         self.game_button.setText("New Game")
         self.isStarted = True
         self.start_menu.delete()
         self.writeText("Hi {}! Game Started!".format(self.player.get_name()))
+ 
         # Add a scene for drawing 2d objects
         self.scene = QtWidgets.QGraphicsScene()
         # Add a view for showing the scene
@@ -136,14 +136,16 @@ class GUI(QtWidgets.QMainWindow):
         self.maze_is_ready = self.world.create_maze_randomly(self.start_menu.get_show_flag())
         if self.maze_is_ready:
             self.add_end_point()
+            self.length = len(self.world.get_stack_list())      # Need for score calculation
             self.game_button.setEnabled(True)
             self.give_up_button.setEnabled(True)
             self.timer.timeout.disconnect()
             self.timer.timeout.connect(self.update_player)
             
     def end_game(self):
-        self.writeText("Game Ended!")
-        self.give_up_button.setEnabled(False)
+        if self.isStarted:
+            self.writeText("Game Ended!")
+            self.give_up_button.setEnabled(False)
         self.isStarted = False
         
     def show_player_paht(self):
@@ -208,13 +210,15 @@ class GUI(QtWidgets.QMainWindow):
             if ((x, y) in path) and ((x, y) != path[-1]):
                 self.world.get_square(x, y).setColor(200, 200 , 200, 150)
             else:
-                self.world.get_square(x, y).setColor(200, 200 , 200, 200)   
+                self.world.get_square(x, y).setColor(200, 200 , 200, 200)
         if (x, y) not in path: path.append((x, y))
         self.world.get_square(x, y).update()
                 
         if (x == end.get_x()) and (y == end.get_y()):
             self.end_game()
+            self.player_steps = len(path)                   # Need for score calculation
             self.show_solving_way()
+            self.update_scoreList()
         self.playerItem.update()
     
     def update_player(self):
@@ -227,6 +231,11 @@ class GUI(QtWidgets.QMainWindow):
         self.time_h_lcd.display(self.time.hour())
         self.time_m_lcd.display(self.time.minute())
         self.time_s_lcd.display(self.time.second())
+    
+    def get_time(self):
+        '''return game time in seconds'''
+        seconds = (self.time.hour()*60*60) + (self.time.minute()*60) + self.time.second()
+        return seconds
         
     def init_window(self):
         # Sets up the window.
@@ -235,7 +244,7 @@ class GUI(QtWidgets.QMainWindow):
         self.setWindowTitle("Labyrinth Game")
         self.timeBox()
         self.console()
-        self.score()
+        self.scoreBox()
         self.init_buttons()
     
     def timeBox(self):
@@ -258,29 +267,48 @@ class GUI(QtWidgets.QMainWindow):
         hbox.addStretch(1)
         self.box.addLayout(hbox, 1)
         
-    def score(self):
+    def scoreBox(self):
         ''' Score '''
-        scoreGBox = QtWidgets.QGroupBox("Score")
+        self.score = Score()
+        GBox = QtWidgets.QGroupBox("Score")
         vbox = QtWidgets.QVBoxLayout()
-        sl1 = QtWidgets.QLabel("1.")
-        sl2 = QtWidgets.QLabel("2.")
-        sl3 = QtWidgets.QLabel("3.")
-        sl4 = QtWidgets.QLabel("4.")
-        sl5 = QtWidgets.QLabel("5.")
         
-        vbox.addWidget(sl1)
-        vbox.addWidget(sl2)
-        vbox.addWidget(sl3)
-        vbox.addWidget(sl4)
-        vbox.addWidget(sl5)
-        vbox.addStretch(1)
+        self.scoreTextBox = QtWidgets.QTextBrowser()
+        self.scoreTextBox.setFont(QtGui.QFont("Carlito"))
+        self.scoreTextBox.append("-----------------<b>Score<b>-----------------")
+        self.scoreTextBox.append("Size|Name|Score|Time(s)")
+        i = 1
+        for line in self.score.get_score_list():
+            self.scoreTextBox.append("{}. {}".format(i, self.score.convert_to_string(line)))
+            i += 1
         
-        scoreGBox.setLayout(vbox)
-        self.box.addWidget(scoreGBox)
+        GBox.setLayout(vbox)
+        self.box.addWidget(self.scoreTextBox, 3)
+    
+    def update_scoreList(self):
+        size = self.world.get_height() * self.world.get_width()
+        if size == 81: size = "Small"
+        elif size == 625: size = "Normal"
+        elif size == 2401: size = "Big"
+        else: size = (self.world.get_height(), self.world.get_width())
+        self.score.compare_score(size, self.player.get_name(), self.get_score(), self.get_time())
+        self.writeText("{} {} {} {}s".format(size, self.player.get_name(), self.get_score(), self.get_time()), QtCore.Qt.darkBlue)
+        self.scoreTextBox.clear()
+        self.scoreTextBox.append("-----------------<b>Score<b>-----------------")
+        self.scoreTextBox.append("Size|Name|Score|Time(s)")
+        i = 1
+        for line in self.score.get_score_list():
+            self.scoreTextBox.append("{}. {}".format(i, self.score.convert_to_string(line)))
+            i += 1
+        self.score.write_to_file()
+    
+    def get_score(self):
+        '''score = ((start and end length) / (player steps)) * (world size)'''
+        if self.start_menu.get_tail_flag(): x = 0.8         # When using the tail, you can get a maximum 80%
+        else: x = 1
+        score = (self.length/self.player_steps) * self.world.get_width() * self.world.get_height() * x
         
-    def get_score(self, x):
-        '''score = (100% * (start and end length) * time.s) / (player steps)'''
-        pass
+        return int(score)
                   
     def console(self):
         self.textLine = 0
