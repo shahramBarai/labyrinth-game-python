@@ -1,6 +1,7 @@
 # Labyrinth Game
 
-## Olen tekemässä ohjelma, joka luo ja piirtää ruudulle labyrintin, sekä asettaa
+## Esittely
+Olen tekemässä ohjelma, joka luo ja piirtää ruudulle labyrintin, sekä asettaa
 pelaajan labyrintin vapaaseen ruutuun. Käyttäjän tehtävä on ohjata hiiri pois
 labyrintistä. Hänellä on mahdollisuus luovuttaa, jolloin ohjelma näyttää oikea
 ratkaisu kuljettamalla hiiri pois labyrintistä. Labyrintti tukee myös toisiaan
@@ -16,18 +17,19 @@ Pelin aikana käyttäjä näkee peliajan ja konsolin, missä ovat pelin kommenti
 Oikeassa alakulmassa ovat kaksi painiketta “New Game” ja “Give Up”. Yllä on
 taulukko, jossa näkyy parhaat pisteet.
 
-## Koodit löytyy src kansiossa, jossa on vain pelin käynnistämisen tarvitavat koodit
+## Tiedosto- ja kansiorakenne
+
+- Koodit löytyy src kansiossa, jossa on vain pelin käynnistämisen tarvitavat koodit
 
 ## Asennusohje
 
 - Ohjelma tarvitsee vain PyQt5 kirjastoa, joka saa asennettua ajamalla komentorivissa
 seuraava komento:
+//Huom: Nämä komennot ajetaan suoraan komentoriviltä, ei Python-tulkista
+pip install pyqt5
 
-	-Komentorivi Windowsilla
-	-Paina näppäínyhdistelmää ’Windowskey + r’. Kirjoita avautuneeseen laatikkoon ’cmd’ ja paina ok.
-	
-	# Huom: Nämä komennot ajetaan suoraan komentoriviltä, ei Python-tulkista
-	pip install pyqt5
+- Komentorivi Windowsilla
+	- Paina näppäínyhdistelmää ’Windowskey + r’. Kirjoita avautuneeseen laatikkoon ’cmd’ ja paina ok.
 	
 ## Käyttöohje
 
